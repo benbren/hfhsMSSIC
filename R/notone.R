@@ -1,4 +1,21 @@
-notone = function(x){ # Makes the equivalent for ne in SAS code as R != returns NA if the value is NA but we want 2 == NA to be FALSE not NA
-  isit = (x !=1 | is.na(x))
+#' A function to make logical equivalencies with SAS
+#'
+#'
+#' Makes the equivalent for ne in SAS code as R != returns NA if the value is NA but we want 2 != NA to be TRUE not NA
+#'
+#' @param x input number
+#' @param y defaults to 1 hence the function name but can be any number.
+#'
+#' @keywords mssic
+#'
+#' @export
+#'
+#' @examples
+#' NA == 1
+#' notone(NA)
+
+
+notone = function(x, y = 1){ # Makes the equivalent for ne in SAS code as R != returns NA if the value is NA but we want 2 == NA to be FALSE not NA
+  isit = (x !=y | is.na(x))
   return(isit)
 }

@@ -1,4 +1,14 @@
-recode.mssic = function(dat, levels = F){
+#' Main ?package function to recode data
+#'
+#' Recodes a merged MSSIC dataset according to the standards set out by the MSSIC analytics team
+#' All values not yet verified to match SAS and STATA.
+#'
+#' @param dat merged mssic dataset
+#' @param levels logical value asking whether number of levels should be computed. Defaults to T as usually they are wanted, but sometimes takes a short while to run hence the option
+#'
+#' @export
+
+recode.mssic = function(dat, levels = T){
   new.dat = dat |>
     mutate(male = case_when(
       gender ==1 ~ 1,
