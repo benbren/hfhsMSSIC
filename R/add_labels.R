@@ -1,16 +1,24 @@
+#' Label recoded MSSIC data for documentation and visualization
+#' @param dat recoded MSSIC dataset
+#' @param missing.as.factor defaults to T, whether to add missing as a factor or leave it as NA
+#'
+#' @export
+
+
+
 add.labels.after.recode = function(dat, missing.as.factor = T){
-  
+
   require("expss")
   if(!require("expss")){stop("Please install expss")}
-  
+
   bincols = apply(dat,2, function(x){all(x %in% c(0,1))})
   dat[bincols] = lapply(dat[bincols], value.label.flag)
-  
+
   if(missing.as.factor){
     bincols.m = apply(dat,2, function(x){all(x %in% c(0,1,NA)) & !all(x %in% c(0,1))})
     dat[bincols.m] = lapply(dat[bincols.m], value.label.flag.missing)
   }
-  
+
   dat = expss::apply_labels(dat,
                             e_lt_ileus = "Ileus",
                             e_lt_utireqcatheter = "Urinary Retention",
@@ -34,11 +42,11 @@ add.labels.after.recode = function(dat, missing.as.factor = T){
                             e_lt_deepveinthrombosis = "DVT",
                             male = "Male",
                             num_levels = "Number of Levels",
-                            Pat_Age = "Age",  
+                            Pat_Age = "Age",
                             surgery_length_hour = "Surgery Length (Hours)",
                             bmi = "BMI"
-                            
+
   )
   dat
-  
+
 }

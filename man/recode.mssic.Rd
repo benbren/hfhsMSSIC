@@ -2,7 +2,7 @@
 % Please edit documentation in R/recode.R
 \name{recode.mssic}
 \alias{recode.mssic}
-\title{Main package function to recode data}
+\title{Main ?package function to recode data}
 \usage{
 recode.mssic(dat, levels = T)
 }
