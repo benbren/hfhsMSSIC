@@ -17,6 +17,8 @@ add.labels.after.recode = function(dat, missing.as.factor = T){
   if(missing.as.factor){
     bincols.m = apply(dat,2, function(x){all(x %in% c(0,1,NA)) & !all(x %in% c(0,1))})
     dat[bincols.m] = lapply(dat[bincols.m], value.label.flag.missing)
+    dat$race1 = factor(dat$race1, levels = c("White", "Black", "Other", NA), labels = c("White", "Black", "Other", "Missing"), exclude = "")
+    dat$smoking_status = factor(dat$smoking_status, levels = c("Never", "Former", "Current", NA), labels = c("Never", "Former", "Current", "Missing"), exclude = "")
   }
 
   dat = expss::apply_labels(dat,
