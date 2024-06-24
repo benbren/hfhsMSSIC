@@ -4,7 +4,7 @@ How to download:
 
 `devtools::install_github("benbren/hfhsMSSIC")`
 
-If the the package has already been downloaded, you should run `detach("package:hfhsMSSIC", unload= T)` to and then re-download using the above so that you get the most recent version of the package!  
+If the the package has already been downloaded, you should run `detach("package:hfhsMSSIC", unload = T)` and then re-download using the above so that you get the most recent version of the package!  
 
 Example workflow: 
 
