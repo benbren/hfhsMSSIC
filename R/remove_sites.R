@@ -18,7 +18,7 @@ remove.sites = function(dat,additional.sites = NULL) {
              521, # DMC Harper University Hospital
              525, # DMC Detroit
              additional.sites)
-  dat <- dat |> filter(!(siteid %in% remove))
+  dat <- dat |> filter(!(Siteid %in% remove))
   dat
 
 }
