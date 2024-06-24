@@ -6,7 +6,7 @@
 #' @param dat merged mssic dataset
 #' @param levels logical value asking whether number of levels should be computed. Defaults to T as usually they are wanted, but sometimes takes a short while to run hence the option
 #'
-#' @export
+#' @export recode.mssic
 
 recode.mssic = function(dat, levels = T){
   new.dat = dat |>
