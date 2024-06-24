@@ -1,5 +1,11 @@
 # A package to support HFHS MSSIC analytics team using R 
 
+How to download: 
+
+`devtools::install_github("benbren/hfhsMSSIC")`
+
+If the the package has already been downloaded, you should run `detach("package:hfhsMSSIC", unload= T)` to and then re-download using the above so that you get the most recent version of the package!  
+
 Example workflow: 
 
 `library(hfhsMMSIC)`
