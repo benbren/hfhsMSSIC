@@ -4,7 +4,7 @@
 \alias{recode.mssic}
 \title{Main ?package function to recode data}
 \usage{
-recode.mssic(dat, levels = T)
+\method{recode}{mssic}(dat, levels = T)
 }
 \arguments{
 \item{dat}{merged mssic dataset}
