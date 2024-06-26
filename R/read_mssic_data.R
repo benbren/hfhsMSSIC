@@ -52,8 +52,8 @@ read.mssic.data <- function(date) {
                                  dy,
                                  "_p000.csv"))
 
-full_dat = proms |> inner_join(ab, by = "Intervention_id", suffix = c("", ".y")) |> select(-ends_with(".y")) |>
-  inner_join(ie, by = "Intervention_id", suffix = c("", ".y")) |> select(-ends_with(".y"))
+full_dat = proms |> inner_join(ab, by = "Intervention_id", suffix = c(".proms", ".ab")) |>
+  inner_join(ie, by = "Intervention_id", suffix = c(".ie", ".pab"))
 
 full_dat
 
