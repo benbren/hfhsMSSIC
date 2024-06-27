@@ -8,7 +8,7 @@
 #'
 #' @export recode.mssic
 
-recode.mssic = function(dat, levels = T){
+recode.mssic = function(dat, levels = T, mcids = T){
   new.dat = dat |>
     mutate(male = case_when(
       gender ==1 ~ 1,
@@ -293,9 +293,90 @@ recode.mssic = function(dat, levels = T){
       #   flg_arthroplasty %in% c(0, NA) & (flg_arthrodesis_lumb %in% c(0,NA)) & flg_instrumentationplaced_lumb==1  ~ max(e_laminectomy_levels, e_arthrodesis_segments_lumb,discectomy_levels_e,na.rm = T)
       # )
       ) |>
-      mutate(num_levels = ifelse(is.infinite(num_levels), NA,num_levels)) #|>
+      mutate(num_levels = ifelse(is.infinite(num_levels), NA,num_levels))
+    }#|>
+    if(mcids){
+      new.dat = new.dat |>
+        mutate(
+          mcid_back_pain_90 = case_when(
+            bl_back_pain >= 2 & !is.na(D90_back_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_back_pain - D90_back_pain) >= 2 ~ 1,
+            bl_back_pain >= 2 & !is.na(D90_back_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_back_pain - D90_back_pain) < 2 ~ 0,
+            T ~ NA
+          ),
+          mcid_back_pain_1y = case_when(
+            bl_back_pain >= 2 & !is.na(Y1_back_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_back_pain - Y1_back_pain) >= 2 ~ 1,
+            bl_back_pain >= 2 & !is.na(Y1_back_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_back_pain - Y1_back_pain) < 2 ~ 0,
+            T ~ NA
+          ),
+          mcid_back_pain_2y = case_when(
+            bl_back_pain >= 2 & !is.na(Y2_back_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_back_pain - Y2_back_pain) >= 2 ~ 1,
+            bl_back_pain >= 2 & !is.na(Y2_back_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_back_pain - Y2_back_pain) < 2 ~ 0,
+            T ~ NA
+          ),
+          mcid_leg_pain_90 = case_when(
+            bl_leg_pain >= 2 & !is.na(D90_leg_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_leg_pain - D90_leg_pain) >= 2 ~ 1,
+            bl_leg_pain >= 2 & !is.na(D90_leg_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_leg_pain - D90_leg_pain) < 2 ~ 0,
+            T ~ NA
+          ),
+          mcid_leg_pain_1y = case_when(
+            bl_leg_pain >= 2 & !is.na(Y1_leg_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_leg_pain - Y1_leg_pain) >= 2 ~ 1,
+            bl_leg_pain >= 2 & !is.na(Y1_leg_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_leg_pain - Y1_leg_pain) < 2 ~ 0,
+            T ~ NA
+          ),
+          mcid_leg_pain_2y = case_when(
+            bl_leg_pain >= 2 & !is.na(Y2_leg_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_leg_pain - Y2_leg_pain) >= 2 ~ 1,
+            bl_leg_pain >= 2 & !is.na(Y2_leg_pain) & Diagnosis_location_e.ab == "Lumbar" & (bl_leg_pain - Y2_leg_pain) < 2 ~ 0,
+            T ~ NA
+          ),
+          mcid_neck_pain_90 = case_when(
+            bl_neck_pain >= 3 & !is.na(D90_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - D90_neck_pain) >= 3 ~ 1,
+            bl_neck_pain >= 3 & !is.na(D90_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - D90_neck_pain) < 3 ~ 0,
+            T ~ NA
+          ),
+          mcid_neck_pain_1y = case_when(
+            bl_neck_pain >= 3 & !is.na(Y1_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - Y1_neck_pain) >= 3 ~ 1,
+            bl_neck_pain >= 3 & !is.na(Y1_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - Y1_neck_pain) < 3 ~ 0,
+            T ~ NA
+          ),
+          mcid_neck_pain_3y = case_when(
+            bl_neck_pain >= 3 & !is.na(Y2_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - Y2_neck_pain) >= 3 ~ 1,
+            bl_neck_pain >= 3 & !is.na(Y2_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - Y2_neck_pain) < 3 ~ 0,
+            T ~ NA
+          ),
+          mcid_arm_pain_90 = case_when(
+            bl_arm_pain >= 3 & !is.na(D90_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - D90_arm_pain) >= 3 ~ 1,
+            bl_arm_pain >= 3 & !is.na(D90_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - D90_arm_pain) < 3 ~ 0,
+            T ~ NA
+          ),
+          mcid_arm_pain_1y = case_when(
+            bl_arm_pain >= 3 & !is.na(Y1_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - Y1_arm_pain) >= 3 ~ 1,
+            bl_arm_pain >= 3 & !is.na(Y1_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - Y1_arm_pain) < 3 ~ 0,
+            T ~ NA
+          ),
+          mcid_arm_pain_3y = case_when(
+            bl_arm_pain >= 3 & !is.na(Y2_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - Y2_arm_pain) >= 3 ~ 1,
+            bl_arm_pain >= 3 & !is.na(Y2_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - Y2_arm_pain) < 3 ~ 0,
+            T ~ NA
+          ),
+          mcid_promis_pf_90 = case_when(
+            bl_promis_pf < 56.9 & !is.na(bl_promis_pf) & !is.na(D90_promis_pf) & ((Diagnosis_location_e.ab == "Lumbar" & (D90_promis_pf - bl_promis_pf) >= 4.5) | (Diagnosis_location_e.ab == "Cervical" & (D90_promis_pf - bl_promis_pf) >= 3))  ~ 1,
+            bl_promis_pf < 56.9 & !is.na(bl_promis_pf) & !is.na(D90_promis_pf) & ((Diagnosis_location_e.ab == "Lumbar" & (D90_promis_pf - bl_promis_pf) < 4.5) | (Diagnosis_location_e.ab == "Cervical" & (D90_promis_pf - bl_promis_pf) < 3)) ~ 0 ,
+            T ~ NA
+          ),
+          mcid_promis_pf_1y = case_when(
+            bl_promis_pf < 56.9 & !is.na(bl_promis_pf) & !is.na(Y1_promis_pf) & ((Diagnosis_location_e.ab == "Lumbar" & (Y1_promis_pf - bl_promis_pf) >= 4.5) | (Diagnosis_location_e.ab == "Cervical" & (Y1_promis_pf - bl_promis_pf) >= 3))  ~ 1,
+            bl_promis_pf < 56.9 & !is.na(bl_promis_pf) & !is.na(Y1_promis_pf) & ((Diagnosis_location_e.ab == "Lumbar" & (Y1_promis_pf - bl_promis_pf) < 4.5) | (Diagnosis_location_e.ab == "Cervical" & (Y1_promis_pf - bl_promis_pf) < 3)) ~ 0 ,
+            T ~ NA
+          ),
+          mcid_promis_pf_2y = case_when(
+            bl_promis_pf < 56.9 & !is.na(bl_promis_pf) & !is.na(Y2_promis_pf) & ((Diagnosis_location_e.ab == "Lumbar" & (Y2_promis_pf - bl_promis_pf) >= 4.5) | (Diagnosis_location_e.ab == "Cervical" & (Y2_promis_pf - bl_promis_pf) >= 3))  ~ 1,
+            bl_promis_pf < 56.9 & !is.na(bl_promis_pf) & !is.na(Y2_promis_pf) & ((Diagnosis_location_e.ab == "Lumbar" & (Y2_promis_pf - bl_promis_pf) < 4.5) | (Diagnosis_location_e.ab == "Cervical" & (Y2_promis_pf - bl_promis_pf) < 3)) ~ 0 ,
+            T ~ NA
+          )
+        )
+
+    }
       #mutate(num_levels = factor(num_levels, levels = c("1","2","3", "4+")))
-  }
   return(new.dat)
 }
 
