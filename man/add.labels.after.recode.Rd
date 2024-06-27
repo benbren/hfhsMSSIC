@@ -4,10 +4,12 @@
 \alias{add.labels.after.recode}
 \title{Label recoded MSSIC data for documentation and visualization}
 \usage{
-add.labels.after.recode(dat, missing.as.factor = T)
+add.labels.after.recode(dat, zero.one = T, missing.as.factor = T)
 }
 \arguments{
 \item{dat}{recoded MSSIC dataset}
+
+\item{zero.one}{parameter to tell whethere to code all binary values with no missing information as yes / no. useful when you know there is a large set of binary variables you will be analyzing which are all yes/no, defaults to T.}
 
 \item{missing.as.factor}{defaults to T, whether to add missing as a factor or leave it as NA}
 }

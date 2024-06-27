@@ -2,6 +2,7 @@
 
 export(add.labels.after.recode)
 export(add.missing.as.factor)
+export(code.binary)
 export(notone)
 export(read.mssic.data)
 export(recode.mssic)
