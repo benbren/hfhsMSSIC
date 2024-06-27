@@ -11,6 +11,6 @@ code.binary = function(dat, varname, labs = c("No", "Yes")){
   if(length(labs) != 2){
     stop("labs argument needs to length two")
   }
-  dat[[varname]] = as.factor(dat[[varname]], levels = c(0,1), labels = labs)
+  dat[[varname]] = factor(dat[[varname]], levels = c(0,1), labels = labs)
   dat
 }
