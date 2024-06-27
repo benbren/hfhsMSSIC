@@ -1,18 +1,20 @@
 #' Label recoded MSSIC data for documentation and visualization
 #' @param dat recoded MSSIC dataset
 #' @param missing.as.factor defaults to T, whether to add missing as a factor or leave it as NA
+#' @param zero.one parameter to tell whethere to code all binary values with no missing information as yes / no. useful when you know there is a large set of binary variables you will be analyzing which are all yes/no, defaults to T.
 #'
 #' @export
 
 
 
-add.labels.after.recode = function(dat, missing.as.factor = T){
+add.labels.after.recode = function(dat, zero.one = T, missing.as.factor = T){
 
   require("expss")
   if(!require("expss")){stop("Please install expss")}
-
-  bincols = apply(dat,2, function(x){all(x %in% c(0,1))})
-  dat[bincols] = lapply(dat[bincols], value.label.flag)
+  if(zero.one){
+    bincols = apply(dat,2, function(x){all(x %in% c(0,1))})
+    dat[bincols] = lapply(dat[bincols], value.label.flag)
+  }
 
   if(missing.as.factor){
     bincols.m = apply(dat,2, function(x){all(x %in% c(0,1,NA)) & !all(x %in% c(0,1))})
