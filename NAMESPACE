@@ -3,7 +3,7 @@
 export(add.labels.after.recode)
 export(add.missing.as.factor)
 export(code.binary)
-export(notone)
+export(is.not)
 export(read.mssic.data)
 export(recode.mssic)
 export(remove.died.in.hospital)

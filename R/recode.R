@@ -10,7 +10,9 @@
 
 recode.mssic = function(dat, levels = T, mcids = T){
   new.dat = dat |>
-    mutate(male = case_when(
+    mutate(
+      calc_age = ifelse(Pat_Age < 18, NA, Pat_Age),
+      male = case_when(
       gender ==1 ~ 1,
       gender == 2 ~ 0,
       T~NA
@@ -29,7 +31,10 @@ recode.mssic = function(dat, levels = T, mcids = T){
       bmi_cat == "overweight" ~ 2,
       bmi_cat == "obese" ~ 3
     ),
-    priv_ins = ifelse(primaryinsurance %in% c(1,3,4,7,10), 1, 0),
+    priv_ins = case_when(
+      primaryinsurance %in% c(1,3,4,7,10) ~ 1,
+      primaryinsurance %in% c(2,5,6,8,9,11,12) ~ 0,
+      T ~ NA),
     # TODO Why was this coded the other way?
     scoliosis = case_when(
       scoliosis_degree_e == 1 ~ 1,
@@ -65,11 +70,13 @@ recode.mssic = function(dat, levels = T, mcids = T){
     pmh_rx_anticoag_use = flg_prescription_anticoag_use,
     flg_fibromyalgia = ifelse(flg_fibromyalgia == 2, 0, flg_fibromyalgia),
     pmh_fibromyalgia = flg_fibromyalgia,
-
-    sxduration1 = ifelse(e_cmb_symptom_duration ==2, 1,0),
-    sxduration2 = ifelse(e_cmb_symptom_duration == 3, 1,0),
-    motor_deficit = ifelse(e_cmb_motor_deficit %in% c(1,2), 1,0),
-    ind_amb_preop = ifelse(e_cmb_ambulation %in% c(1,4), 1,0),
+    e_cmb_symptom_duration = ifelse(e_cmb_symptom_duration == 4, NA, e_cmb_symptom_duration),
+    sx_duration1 = ifelse(e_cmb_symptom_duration == 2, 1,0),
+    sx_duration2 = ifelse(e_cmb_symptom_duration == 3, 1,0),
+    ind_amb_preop = case_when(
+      e_cmb_ambulation %in% c(1,4) ~ 1,
+      e_cmb_ambulation %in% c(2,3) ~ 0,
+      T ~ NA),
     prior_physical_therapy = ifelse(grepl("1", e_nonsurgical_treatments), 1,0),
     prior_chiropractor = ifelse(grepl("2", e_nonsurgical_treatments), 1,0),
     prior_injection = ifelse(grepl("3", e_nonsurgical_treatments), 1,0),
@@ -83,9 +90,12 @@ recode.mssic = function(dat, levels = T, mcids = T){
       grepl("2", surgicalapproach_cerv) & !grepl("1", surgicalapproach_cerv) ~ 2, # posterior only
       grepl("1", surgicalapproach_cerv) & grepl("2", surgicalapproach_cerv) ~ 3 # anterior and posterior
     ),
-    anterior = ifelse(surgical_approach_cerv == 1, 1,0) ,
-    posterior = ifelse(surgical_approach_cerv == 2, 1,0),
-    anterior_posterior = ifelse(surgical_approach_cerv == 3, 1,0),
+    anterior_posterior = case_when(surgical_approach_cerv == 3 ~ 1,
+                                   T ~ 0),
+    anterior = case_when(surgical_approach_cerv == 1 ~ 1,
+                         T ~ 0) ,
+    posterior = case_when(surgical_approach_cerv == 2 ~  1,
+                          T ~ 0),
     prev_spinesurgery = case_when(
       e_prev_spinesurgery == 1 ~ 1,
       e_prev_spinesurgery %in% c(0,2) | e_prev_surgery %in% c(0,2) ~ 0,
@@ -98,7 +108,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
     flg_cerv_path_instability = ifelse(grepl("4", e_cerv_dis_state), 1,0),
     flg_cerv_path_adjacent = ifelse(grepl("6", e_cerv_dis_state), 1,0),
     flg_cerv_path_revision = ifelse(grepl("5", e_cerv_dis_state), 1,0),
-    flg_cerv_path_pseudoarthritis = ifelse(grepl("8", e_cerv_dis_state), 1,0),
+    flg_cerv_path_pseudoarthrosis = ifelse(grepl("8", e_cerv_dis_state), 1,0),
     flg_cerv_path_synovial_cyst = ifelse(grepl("9", e_cerv_dis_state), 1,0),
 
     flg_cerv_clin_radicular = ifelse(grepl("2", e_cerv_clinpresentation), 1,0),
@@ -113,7 +123,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
     flg_lum_path_recurrent_disc = ifelse(grepl("4", e_lum_dis_state), 1,0),
     flg_lum_path_adjacent = ifelse(grepl("5", e_lum_dis_state), 1,0),
     flg_lum_path_revision = ifelse(grepl("6", e_lum_dis_state), 1,0),
-    flg_lum_path_peudoarthrosis = ifelse(grepl("8", e_lum_dis_state), 1,0),
+    flg_lum_path_pseudoarthrosis = ifelse(grepl("8", e_lum_dis_state), 1,0),
     flg_lum_path_synovial_cyst = ifelse(grepl("9", e_lum_dis_state), 1,0),
 
     flg_lum_clin_axial_pain = ifelse(grepl("1", e_lum_clinpresentation),1,0),
@@ -121,21 +131,23 @@ recode.mssic = function(dat, levels = T, mcids = T){
     flg_lum_clin_bowel_dysfunction = ifelse(grepl("4", e_lum_clinpresentation),1,0),
     flg_lum_clin_muscle_weakness = ifelse(grepl("5", e_lum_clinpresentation),1,0),
     flg_lum_clin_footdrop = ifelse(grepl("6", e_lum_clinpresentation),1,0),
-    flg_lum_clin_balance_gait = ifelse(grepl("9", e_lum_clinpresentation),1,0),
+    flg_lum_balance_gait = ifelse(grepl("9", e_lum_clinpresentation),1,0),
 
 
     race = bl_race,
-    race = case_when(
-      race_e == 1 ~ 5,
-      race_e == 2 ~ 3,
-      race_e == 3 ~ 2,
-      race_e == 4 ~ 4,
-      race_e == 5 ~ 9,
-      race_e == 6 ~ 8,
-      race_e == 7 ~ 1,
-      race_e == 8 ~ 10,
-      T ~ race
-    ),
+    race = ifelse(race == 6 | race == 10 ,
+                  case_when(
+                    race_e == 1 ~ 5,
+                    race_e == 2 ~ 3,
+                    race_e == 3 ~ 2,
+                    race_e == 4 ~ 4,
+                    race_e == 5 ~ 9,
+                    race_e == 6 ~ 8,
+                    race_e == 7 ~ 1,
+                    race_e == 8 ~ 10,
+                    T ~ race
+                  ),
+                  race),
     race1 = factor(case_when(
       race == 1 ~ "White",
       race == 2 ~ "Black",
@@ -143,8 +155,10 @@ recode.mssic = function(dat, levels = T, mcids = T){
       T ~ NA
     ), levels = c("White", "Black", "Other")),
     race_miss = ifelse(bl_race %in% c(NA,10) & race_e %in% c(NA,8),1,0),
-    black = ifelse((bl_race == 2 | (bl_race %in% c(NA,10) & race_e == 3)), 1,0),
-    other_race = ifelse(bl_race %in% c(3:5,7:9) | (bl_race %in% c(NA,10) & race_e %in% c(1:6)),1,0),
+    black = case_when((bl_race == 2 | (bl_race %in% c(NA,10) & race_e == 3)) ~ 1,
+                      T ~ 0),
+    other_race = case_when(bl_race %in% c(3:5,7:9) | (bl_race %in% c(NA,10) & race_e %in% c(1,2,4:6)) ~ 1,
+                           T ~ 0),
     smoking_status = factor(case_when(
       bl_smoker %in% c(1,2) | (is.na(bl_smoker) & tobacco_use_e == 1) ~ 1,
       bl_smoker ==3 | (is.na(bl_smoker) & tobacco_use_e == 2) ~ 2,
@@ -152,7 +166,11 @@ recode.mssic = function(dat, levels = T, mcids = T){
       T ~ NA
     ), levels = c(1,2,3,NA), labels = c("Current", "Former", "Never")),
     smoke_miss = ifelse(is.na(bl_smoker) & tobacco_use_e %in% c(NA,4), 1,0),
-    current_smoker = ifelse(bl_smoker %in% c(1,2) | (is.na(bl_smoker) & tobacco_use_e == 1), 1,0),
+    current_smoker = case_when(
+      smoking_status == "Current" ~ 1,
+      smoking_status == "Former" | smoking_status == "Never" ~ 0,
+      T ~ NA
+    ),
     # TODO: What is going on with education here?
     educ_lths = ifelse(bl_educ == 1, 1,0),
     educ_college2 = ifelse(bl_educ == 3, 1, 0),
@@ -167,10 +185,16 @@ recode.mssic = function(dat, levels = T, mcids = T){
     ),
 
     preop_opiuse = ifelse(bl_op_painkiller == 1, 1,0),
-    phq2_depression_baseline = ifelse(bl_phq2score %in% c(0,1,2),0,1),
+    phq2_depression_baseline = case_when(bl_phq2score %in% c(3:6) ~ 1,
+                                         bl_phq2score %in% c(0,1,2) ~ 0,
+                                         T ~ NA),
     educ_miss = ifelse(is.na(educ_lths),1,0),
     opiod_miss = ifelse(is.na(preop_opiuse),1,0),
     phq2_miss = ifelse(is.na(phq2_depression_baseline),1,0),
+    motor_deficit = case_when(
+      e_cmb_motor_deficit %in% c(1,2) ~ 1,
+      e_cmb_motor_deficit == 0 ~ 0,
+      T ~ NA),
     motor_miss = case_when(
       is.na(e_cmb_motor_deficit) ~ NA,
       is.na(motor_deficit) ~ 1,
@@ -178,37 +202,39 @@ recode.mssic = function(dat, levels = T, mcids = T){
     ),
     #sx_duration1 = ifelse(duration_miss == 1, 0,sx_duration1),
     #sx_duration2 = ifelse(duration_miss == 1, 0,sx_duration2),
-    across(c("educ_lths", "educ_college2", "educ_degree", "preop_opiuse", "phq2_depression_baseline"), ~replace_na(.x,0)),
+    #across(c("educ_lths", "educ_college2", "educ_degree", "preop_opiuse"), ~replace_na(.x,0)),
     outpatient = ifelse(encounter_type_e == 2, 1,0),
     proctype = case_when(
       flg_arthroplasty == 1 ~ 0,
       (flg_arthrodesis_cerv == 1 | flg_arthrodesis_lumb == 1) & (flg_instrumentationplaced_cerv == 1 | flg_instrumentationplaced_lumb ==1) ~ 1,
       (flg_arthrodesis_cerv == 1 | flg_arthrodesis_lumb == 1) & (flg_instrumentationplaced_cerv == 0 | flg_instrumentationplaced_lumb ==0) ~ 2,
-      (notone(flg_arthrodesis_cerv) & notone(flg_arthrodesis_lumb)) & notone(flg_arthroplasty) & (fl_laminectomyetc ==1 | flg_discectomy == 1) & (notone(flg_instrumentationplaced_cerv) & notone(flg_instrumentationplaced_lumb)) ~ 3,
+      (is.not(flg_arthrodesis_cerv) & is.not(flg_arthrodesis_lumb)) & is.not(flg_arthroplasty) & (fl_laminectomyetc ==1 | flg_discectomy == 1) & (is.not(flg_instrumentationplaced_cerv) & is.not(flg_instrumentationplaced_lumb)) ~ 3,
       #flg_arthrodesis_cerv != 1 & flg_arthrodesis_lumb != 1) & flg_arthroplasty !=1 & (fl_laminectomyetc ==1 | flg_discectomy == 1) & (flg_instrumentationplaced_cerv !=1 & flg_instrumentationplaced_lumb !=1) ~ 3,
       T ~ 4
     ),
     fusion = ifelse(proctype %in% c(1,2), 1,0),
-    discharge_not_home = case_when(
-      e_discharge_place %in% c(1,2) ~ 0 ,
-      e_discharge_place %in% c(4,5,8,9,10) ~1,
+    discharge_home = case_when(
+      e_discharge_place %in% c(1,2) ~ 1 ,
+      e_discharge_place %in% c(4,5,8,9,10) ~0,
       T ~ NA
     ),
     surgery_length_hour = val_surgery_length/60,
-    e_cmb_symptom_duration = ifelse(e_cmb_symptom_duration == 4, NA, e_cmb_symptom_duration),
     flg_readmit = ifelse(
-      (e_readmit1==1 & notone(e_readmit1_multi_stage) & e_readmit1_complications != 29) |
-        (e_readmit2==1 & notone(e_readmit2_multi_stage) & e_readmit2_complications != 29)  |
-        (e_readmit3==1 & notone(e_readmit3_multi_stage) & e_readmit3_complications !=29),
+      (!is.na(e_readmit1) & e_readmit1==1 & is.not(e_readmit1_multi_stage) & is.not(e_readmit1_complications, 29)) |
+        (!is.na(e_readmit2) & e_readmit2==1 & is.not(e_readmit2_multi_stage) & is.not(e_readmit2_complications,29))  |
+        (!is.na(e_readmit3) & e_readmit3==1 & is.not(e_readmit3_multi_stage) & is.not(e_readmit3_complications,29)),
       1,
       0
     ),
-    flg_readmit_reop = ifelse((returntoor1==1 & !(unplanned_spine_90d_e %in% c(3,4,5))) |
-                                (returntoor2==1 & !(unplanned_spine_90d_e %in% c(3,4,5))) |
-                                (returntoor3==1 & !(unplanned_spine_90d_e %in% c(3,4,5))),
+    flg_readmit_reop = ifelse((!is.na(returntoor1) & returntoor1==1 & !(unplanned_spine_90d_e %in% c(3,4,5))) |
+                                (!is.na(returntoor2) & returntoor2==1 & !(unplanned_spine2_90d_e %in% c(3,4,5))) |
+                                (!is.na(returntoor3) & returntoor3==1 & !(unplanned_spine3_90d_e %in% c(3,4,5))),
                               1,
                               0),
-    # TODO employed_baseline = ifelse(e_employment == 1, 1,0)
+    employed_baseline = case_when(
+              bl_employment %in% c(1,5) ~ 1,
+              bl_employment %in% c(0,2,3,4) ~ 0,
+              T ~ NA),
     #CANT FIND E_EMPLOYMENT
     bl_promis_pf1 = as.numeric(bl_promis_pf),
     flg_urinary_retention = e_lt_utireqcatheter,
@@ -217,7 +243,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
     flg_axial_pain = e_lt_axial_pain,
     flg_claudication = e_lt_claudication,
     flg_dvt = e_lt_deepveinthrombosis,
-    flg_ed_visit = visit_obs_b,
+    flg_ed_visit_obs_stay = visit_obs_b,
     flg_ileus = e_lt_ileus,
     flg_mi = e_lt_myocardialinfarction,
     flg_myelopathy = e_lt_myelopathy,
@@ -238,11 +264,32 @@ recode.mssic = function(dat, levels = T, mcids = T){
       flg_readmit == 1 |
       flg_pe == 1 |
       flg_ssi == 1 |
+      flg_urinary_retention == 1 |
+      flg_wound_dehiscense == 1 |
+      flg_csfleak == 1 |
       flg_myelopathy == 1 |
       flg_dysphagia == 1),
       1,
       0),
+  any_complication = ifelse(is.na(any_complication),0, any_complication),
 
+ rtw_90day = case_when(
+   !is.na(D90_returntowork) & D90_returntowork %in% c(1,4) ~ 1,
+   !is.na(D90_returntowork) & !(D90_returntowork %in% c(1,4)) ~ 0,
+   T ~ NA
+ ),
+
+ rtw_1yr = case_when(
+   !is.na(Y1_returntowork) & Y1_returntowork %in% c(1,4) ~ 1,
+   !is.na(Y1_returntowork) & !(Y1_returntowork %in% c(1,4)) ~ 0,
+   T ~ NA
+ ),
+
+ rtw_2yr = case_when(
+   !is.na(Y2_returntowork) & Y2_returntowork %in% c(1,4) ~ 1,
+   !is.na(Y2_returntowork) & !(Y2_returntowork %in% c(1,4)) ~ 0,
+   T ~ NA
+ ),
 
  flg_satisfy_90d = dplyr::case_when(
      D90_satisfaction %in% c(1,2) ~ 1,
@@ -259,23 +306,31 @@ recode.mssic = function(dat, levels = T, mcids = T){
      Y2_satisfaction %in% c(3,4) ~ 0,
      T ~ NA
    ),
-   phq_depression_90d = case_when(
+   phq2_depression_90d = case_when(
      D90_phq2score %in% c(0,1,2) ~ 0,
      D90_phq2score %in% c(3,4,5,6) ~ 1,
      T ~ NA
    ),
-   phq_depression_1y = case_when(
+   phq2_depression_1y = case_when(
      Y1_phq2score %in% c(0,1,2) ~ 0,
      Y1_phq2score %in% c(3,4,5,6) ~ 1,
      T ~ NA
    ),
-   phq_depression_2y = case_when(
+   phq2_depression_2y = case_when(
      Y2_phq2score %in% c(0,1,2) ~ 0,
      Y2_phq2score %in% c(3,4,5,6) ~ 1,
      T ~ NA
    )
    )
-
+  new.dat = new.dat |> rowwise() |> mutate(
+    n_fused = max(c(e_arthrodesis_segments_cerv, e_arthrodesis_segments_lumb), na.rm = T),
+    n_instrumented = case_when(
+      flg_instrumentationplaced_cerv == 1 | flg_instrumentationplaced_lumb == 1 ~ n_fused,
+      T ~ 0
+    ),
+    surg_invasiveness = sum(c(n_fused,n_instrumented, e_laminectomy_levels, discectomy_levels_e), na.rm = T),
+    surg_invasiveness = ifelse(is.infinite(surg_invasiveness), NA, surg_invasiveness)
+  )
   if(levels){
     new.dat = new.dat |> rowwise() |>
       mutate(
@@ -283,8 +338,8 @@ recode.mssic = function(dat, levels = T, mcids = T){
       num_levels = case_when(
         flg_arthroplasty == 1 ~ val_athrolevels,
         flg_arthroplasty %in% c(0,NA) & (flg_arthrodesis_cerv == 1 | flg_arthrodesis_lumb == 1) ~ max(e_arthrodesis_segments_cerv,e_arthrodesis_segments_lumb,na.rm = T),
-        flg_arthroplasty %in% c(0, NA) & (notone(flg_arthrodesis_cerv) & notone(flg_arthrodesis_lumb)) & (fl_laminectomyetc == 1 | flg_discectomy == 1) & (notone(flg_instrumentationplaced_cerv) & notone(flg_instrumentationplaced_lumb)) ~ max(e_laminectomy_levels,discectomy_levels_e, na.rm = T),
-        flg_arthroplasty %in% c(0, NA) & (notone(flg_arthrodesis_cerv) & notone(flg_arthrodesis_lumb))&(flg_instrumentationplaced_cerv==1 | flg_instrumentationplaced_lumb==1)  ~ max(e_laminectomy_levels, e_arthrodesis_segments_lumb,e_arthrodesis_segments_cerv,discectomy_levels_e, na.rm = T)
+        flg_arthroplasty %in% c(0, NA) & (is.not(flg_arthrodesis_cerv) & is.not(flg_arthrodesis_lumb)) & (fl_laminectomyetc == 1 | flg_discectomy == 1) & (is.not(flg_instrumentationplaced_cerv) & is.not(flg_instrumentationplaced_lumb)) ~ max(e_laminectomy_levels,discectomy_levels_e, na.rm = T),
+        flg_arthroplasty %in% c(0, NA) & (is.not(flg_arthrodesis_cerv) & is.not(flg_arthrodesis_lumb))&(flg_instrumentationplaced_cerv==1 | flg_instrumentationplaced_lumb==1)  ~ max(e_laminectomy_levels, e_arthrodesis_segments_lumb,e_arthrodesis_segments_cerv,discectomy_levels_e, na.rm = T)
        )#,
       # num_levels_lum = case_when(
       #   flg_arthroplasty == 1 & val_athrolevels > 1 ~ val_athrolevels,
@@ -338,7 +393,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
             bl_neck_pain >= 3 & !is.na(Y1_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - Y1_neck_pain) < 3 ~ 0,
             T ~ NA
           ),
-          mcid_neck_pain_3y = case_when(
+          mcid_neck_pain_2y = case_when(
             bl_neck_pain >= 3 & !is.na(Y2_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - Y2_neck_pain) >= 3 ~ 1,
             bl_neck_pain >= 3 & !is.na(Y2_neck_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_neck_pain - Y2_neck_pain) < 3 ~ 0,
             T ~ NA
@@ -353,7 +408,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
             bl_arm_pain >= 3 & !is.na(Y1_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - Y1_arm_pain) < 3 ~ 0,
             T ~ NA
           ),
-          mcid_arm_pain_3y = case_when(
+          mcid_arm_pain_2y = case_when(
             bl_arm_pain >= 3 & !is.na(Y2_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - Y2_arm_pain) >= 3 ~ 1,
             bl_arm_pain >= 3 & !is.na(Y2_arm_pain) & Diagnosis_location_e.ab == "Cervical" & (bl_arm_pain - Y2_arm_pain) < 3 ~ 0,
             T ~ NA

@@ -21,12 +21,13 @@ add.labels.after.recode = function(dat, zero.one = T, missing.as.factor = T){
     dat[bincols.m] = lapply(dat[bincols.m], value.label.flag.missing)
     dat$race1 = factor(dat$race1, levels = c("White", "Black", "Other", NA), labels = c("White", "Black", "Other", "Missing"), exclude = "")
     dat$smoking_status = factor(dat$smoking_status, levels = c("Never", "Former", "Current", NA), labels = c("Never", "Former", "Current", "Missing"), exclude = "")
+    dat$num_levels = factor(ifelse(dat$num_levels >= 4, "4+", as.character(dat$num_levels)), levels = c("1", "2", "3","4+"))
   }
 
   dat = expss::apply_labels(dat,
                             e_lt_ileus = "Ileus",
                             e_lt_utireqcatheter = "Urinary Retention",
-                            discharge_not_home = "Non-home discharge",
+                            discharge_home = "Home discharge",
                             race1 = "Race",
                             fusion = "Fusion",
                             diabetes = "Diabetes",
