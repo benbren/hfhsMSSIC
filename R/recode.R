@@ -273,21 +273,23 @@ recode.mssic = function(dat, levels = T, mcids = T){
       0),
   any_complication = ifelse(is.na(any_complication),0, any_complication),
 
+
+
  rtw_90day = case_when(
-   !is.na(D90_returntowork) & D90_returntowork %in% c(1,4) ~ 1,
-   !is.na(D90_returntowork) & !(D90_returntowork %in% c(1,4)) ~ 0,
+   !is.na(D90_returntowork) & D90_returntowork %in% c(1,4) & bl_pln_return2work == 1 ~ 1,
+   !is.na(D90_returntowork) & !(D90_returntowork %in% c(1,4)) & bl_pln_return2work == 1 ~ 0,
    T ~ NA
  ),
 
  rtw_1yr = case_when(
-   !is.na(Y1_returntowork) & Y1_returntowork %in% c(1,4) ~ 1,
-   !is.na(Y1_returntowork) & !(Y1_returntowork %in% c(1,4)) ~ 0,
+   !is.na(Y1_returntowork) & Y1_returntowork %in% c(1,4) & bl_pln_return2work == 1 ~ 1,
+   !is.na(Y1_returntowork) & !(Y1_returntowork %in% c(1,4)) & bl_pln_return2work == 1 ~ 0,
    T ~ NA
  ),
 
  rtw_2yr = case_when(
-   !is.na(Y2_returntowork) & Y2_returntowork %in% c(1,4) ~ 1,
-   !is.na(Y2_returntowork) & !(Y2_returntowork %in% c(1,4)) ~ 0,
+   !is.na(Y2_returntowork) & Y2_returntowork %in% c(1,4) & bl_pln_return2work == 1 ~ 1,
+   !is.na(Y2_returntowork) & !(Y2_returntowork %in% c(1,4)) & bl_pln_return2work == 1 ~ 0,
    T ~ NA
  ),
 
@@ -322,15 +324,18 @@ recode.mssic = function(dat, levels = T, mcids = T){
      T ~ NA
    )
    )
+
   new.dat = new.dat |> rowwise() |> mutate(
-    n_fused = max(c(e_arthrodesis_segments_cerv, e_arthrodesis_segments_lumb), na.rm = T),
+    n_fused = max(c(e_arthrodesis_segments_cerv, e_arthrodesis_segments_lumb), na.rm = T) + 1,
+    n_fused = ifelse(is.infinite(n_fused), NA,n_fused),
     n_instrumented = case_when(
-      flg_instrumentationplaced_cerv == 1 | flg_instrumentationplaced_lumb == 1 ~ n_fused,
+      (!is.na(flg_instrumentationplaced_cerv) &  flg_instrumentationplaced_cerv == 1) | (!is.na(flg_instrumentationplaced_lumb) &  flg_instrumentationplaced_lumb == 1)  ~ n_fused,
       T ~ 0
     ),
     surg_invasiveness = sum(c(n_fused,n_instrumented, e_laminectomy_levels, discectomy_levels_e), na.rm = T),
-    surg_invasiveness = ifelse(is.infinite(surg_invasiveness), NA, surg_invasiveness)
-  )
+    surg_invasiveness = ifelse(all(sapply(c(n_fused,n_instrumented, e_laminectomy_levels, discectomy_levels_e), is.na)), NA, surg_invasiveness)
+  ) |> ungroup()
+
   if(levels){
     new.dat = new.dat |> rowwise() |>
       mutate(
