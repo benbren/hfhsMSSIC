@@ -232,7 +232,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
                               1,
                               0),
     employed_baseline = case_when(
-              bl_employment %in% c(1,5) ~ 1,
+              bl_employment %in% c(5,6) ~ 1,
               bl_employment %in% c(0,2,3,4) ~ 0,
               T ~ NA),
     #CANT FIND E_EMPLOYMENT
