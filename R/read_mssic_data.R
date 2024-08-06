@@ -7,7 +7,7 @@
 #' @export
 
 
-read.mssic.data <- function(date) {
+read.mssic.data <- function(date, all = T) {
 
   lapply(c("stringr", "lubridate", "dplyr", "readr"), require, character.only =  T)
 
@@ -29,6 +29,8 @@ read.mssic.data <- function(date) {
     no.dash,
     "/"
   )
+
+
 
   ab = readr::read_csv(paste0(fp, "/mssic_abstraction_form_",
                                  y,
@@ -52,9 +54,12 @@ read.mssic.data <- function(date) {
                                  dy,
                                  "_p000.csv"))
 
+
 full_dat = proms |> inner_join(ab, by = "Intervention_id", suffix = c(".proms", ".ab")) |>
   inner_join(ie, by = "Intervention_id", suffix = c(".ie", ".pab"))
 
-return(list(full_dat = full_dat, ab = ab, proms = proms, ie = ie))
+if(all){ret = list(full_dat = full_dat, ab = ab, proms = proms, ie = ie)} else {ret = full_dat}
+
+return(ret)
 
 }
