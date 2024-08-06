@@ -36,7 +36,7 @@ read.mssic.data <- function(date) {
                                  mo,
                                  "-",
                                  dy,
-                                 "_p000.csv")) |> filter(abstraction_form_status == "complete")
+                                 "_p000.csv")) #|> filter(abstraction_form_status == "complete")
   proms = readr::read_csv(paste0(fp, "/mssic_proms_",
                                  y,
                                  "-",
