@@ -135,7 +135,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
 
 
     race = bl_race,
-    race = ifelse(race == 6 | race == 10 ,
+    race = ifelse(race == 6 | race == 10 | is.na(race),
                   case_when(
                     race_e == 1 ~ 5,
                     race_e == 2 ~ 3,
