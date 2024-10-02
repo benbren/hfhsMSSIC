@@ -29,8 +29,7 @@ read.mssic.data <- function(date, all = T, filt = T) {
     "/",
     m.n,
     "/",
-    no.dash,
-    "/"
+    no.dash
   )
 
 
