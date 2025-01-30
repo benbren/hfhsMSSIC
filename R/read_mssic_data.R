@@ -15,9 +15,9 @@ read.mssic.data <- function(date, all = T, filt = T) {
   lapply(c("stringr", "lubridate", "dplyr", "readr"), require, character.only =  T)
 
 
-  dt = mdy(date)
-  m = month(dt)
-  m.n = month(dt, label = T, abbr = F)
+  dt = lubridate::mdy(date)
+  m = lubridate::month(dt)
+  m.n = lubridate::month(dt, label = T, abbr = F)
   no.dash = paste0(stringr::str_split(date, "-")[[1]], collapse = "")
   dy = format(dt, "%d")
   mo = format(dt, "%m")
