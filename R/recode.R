@@ -9,6 +9,7 @@
 #' @export recode.mssic
 
 recode.mssic = function(dat, levels = T, mcids = T){
+  library(hfhsMSSIC)
   new.dat = dat |>
     mutate(
       calc_age = ifelse(Pat_Age < 18, NA, Pat_Age),
@@ -135,30 +136,12 @@ recode.mssic = function(dat, levels = T, mcids = T){
 
 
     race = bl_race,
-    race = ifelse(race == 6 | race == 10 | is.na(race),
-                  case_when(
-                    race_e == 1 ~ 5,
-                    race_e == 2 ~ 3,
-                    race_e == 3 ~ 2,
-                    race_e == 4 ~ 4,
-                    race_e == 5 ~ 9,
-                    race_e == 6 ~ 8,
-                    race_e == 7 ~ 1,
-                    race_e == 8 ~ 10,
-                    T ~ race
-                  ),
-                  race),
-    race1 = factor(case_when(
-      race == 1 ~ "White",
-      race == 2 ~ "Black",
-      race %in% c(3:5, 7:9) ~ "Other",
-      T ~ NA
-    ), levels = c("White", "Black", "Other")),
-    race_miss = ifelse(bl_race %in% c(NA,10) & race_e %in% c(NA,8),1,0),
-    black = case_when((bl_race == 2 | (bl_race %in% c(NA,10) & race_e == 3)) ~ 1,
-                      T ~ 0),
-    other_race = case_when(bl_race %in% c(3:5,7:9) | (bl_race %in% c(NA,10) & race_e %in% c(1,2,4:6)) ~ 1,
-                           T ~ 0),
+    white = ifelse((race == "1" | race %in% c("", "10")) & (race_e == "7"), 1,0),
+    white = ifelse(race %in% c("10", "") & race_e %in% c("","8"), NA, white),
+    black = ifelse((race == "2" | race %in% c("", "10")) & (race_e == "3"), 1,0),
+    black = ifelse(race %in% c("10", "") & race_e %in% c("","8"), NA, black),
+    other_race = ifelse(!(black ==1 | white == 1 | is.na(black) |is.na(white)), 1,0),
+    other_race = ifelse(race %in% c("10", "") & race_e %in% c("","8"), NA, other_race),
     smoking_status = factor(case_when(
       bl_smoker %in% c(1,2) | (is.na(bl_smoker) & tobacco_use_e == 1) ~ 1,
       bl_smoker ==3 | (is.na(bl_smoker) & tobacco_use_e == 2) ~ 2,

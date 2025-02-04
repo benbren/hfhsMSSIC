@@ -34,13 +34,16 @@ read.mssic.data <- function(date, all = T, filt = T) {
 
 
 
-  ab = read.csv(paste0(fp, "/mssic_abstraction_form_",
+  tryCatch({
+    ab = read.csv(paste0(fp, "/mssic_abstraction_form_",
                                  y,
                                  "-",
                                  mo,
                                  "-",
                                  dy,
-                                 "_p000.csv")) #|> filter(abstraction_form_status == "complete")
+                                 "_p000.csv"))},
+error = function(e){ message(paste("Error:", e, "Did you input the date correctly? (Ex: XX-XX-XXXX)")); stop()}
+    )#|> filter(abstraction_form_status == "complete")
   proms = read.csv(paste0(fp, "/mssic_proms_",
                                  y,
                                  "-",
