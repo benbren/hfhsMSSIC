@@ -9,7 +9,6 @@
 #' @export recode.mssic
 
 recode.mssic = function(dat, levels = T, mcids = T){
-  library(hfhsMSSIC)
   new.dat = dat |>
     mutate(
       calc_age = ifelse(Pat_Age < 18, NA, Pat_Age),
@@ -191,7 +190,7 @@ recode.mssic = function(dat, levels = T, mcids = T){
       flg_arthroplasty == 1 ~ 0,
       (flg_arthrodesis_cerv == 1 | flg_arthrodesis_lumb == 1) & (flg_instrumentationplaced_cerv == 1 | flg_instrumentationplaced_lumb ==1) ~ 1,
       (flg_arthrodesis_cerv == 1 | flg_arthrodesis_lumb == 1) & (flg_instrumentationplaced_cerv == 0 | flg_instrumentationplaced_lumb ==0) ~ 2,
-      (is.not(flg_arthrodesis_cerv) & is.not(flg_arthrodesis_lumb)) & is.not(flg_arthroplasty) & (fl_laminectomyetc ==1 | flg_discectomy == 1) & (is.not(flg_instrumentationplaced_cerv) & is.not(flg_instrumentationplaced_lumb)) ~ 3,
+      (hfhsMSSIC::is.not(flg_arthrodesis_cerv) & hfhsMSSIC::is.not(flg_arthrodesis_lumb)) & hfhsMSSIC::is.not(flg_arthroplasty) & (fl_laminectomyetc ==1 | flg_discectomy == 1) & (hfhsMSSIC::is.not(flg_instrumentationplaced_cerv) & hfhsMSSIC::is.not(flg_instrumentationplaced_lumb)) ~ 3,
       #flg_arthrodesis_cerv != 1 & flg_arthrodesis_lumb != 1) & flg_arthroplasty !=1 & (fl_laminectomyetc ==1 | flg_discectomy == 1) & (flg_instrumentationplaced_cerv !=1 & flg_instrumentationplaced_lumb !=1) ~ 3,
       T ~ 4
     ),
@@ -203,9 +202,9 @@ recode.mssic = function(dat, levels = T, mcids = T){
     ),
     surgery_length_hour = val_surgery_length/60,
     flg_readmit = ifelse(
-      (!is.na(e_readmit1) & e_readmit1==1 & is.not(e_readmit1_multi_stage) & is.not(e_readmit1_complications, 29)) |
-        (!is.na(e_readmit2) & e_readmit2==1 & is.not(e_readmit2_multi_stage) & is.not(e_readmit2_complications,29))  |
-        (!is.na(e_readmit3) & e_readmit3==1 & is.not(e_readmit3_multi_stage) & is.not(e_readmit3_complications,29)),
+      (!is.na(e_readmit1) & e_readmit1==1 & hfhsMSSIC::is.not(e_readmit1_multi_stage) & hfhsMSSIC::is.not(e_readmit1_complications, 29)) |
+        (!is.na(e_readmit2) & e_readmit2==1 & hfhsMSSIC::is.not(e_readmit2_multi_stage) & hfhsMSSIC::is.not(e_readmit2_complications,29))  |
+        (!is.na(e_readmit3) & e_readmit3==1 & hfhsMSSIC::is.not(e_readmit3_multi_stage) & hfhsMSSIC::is.not(e_readmit3_complications,29)),
       1,
       0
     ),
@@ -326,8 +325,8 @@ recode.mssic = function(dat, levels = T, mcids = T){
       num_levels = case_when(
         flg_arthroplasty == 1 ~ val_athrolevels,
         flg_arthroplasty %in% c(0,NA) & (flg_arthrodesis_cerv == 1 | flg_arthrodesis_lumb == 1) ~ max(e_arthrodesis_segments_cerv,e_arthrodesis_segments_lumb,na.rm = T),
-        flg_arthroplasty %in% c(0, NA) & (is.not(flg_arthrodesis_cerv) & is.not(flg_arthrodesis_lumb)) & (fl_laminectomyetc == 1 | flg_discectomy == 1) & (is.not(flg_instrumentationplaced_cerv) & is.not(flg_instrumentationplaced_lumb)) ~ max(e_laminectomy_levels,discectomy_levels_e, na.rm = T),
-        flg_arthroplasty %in% c(0, NA) & (is.not(flg_arthrodesis_cerv) & is.not(flg_arthrodesis_lumb))&(flg_instrumentationplaced_cerv==1 | flg_instrumentationplaced_lumb==1)  ~ max(e_laminectomy_levels, e_arthrodesis_segments_lumb,e_arthrodesis_segments_cerv,discectomy_levels_e, na.rm = T)
+        flg_arthroplasty %in% c(0, NA) & (hfhsMSSIC::is.not(flg_arthrodesis_cerv) & hfhsMSSIC::is.not(flg_arthrodesis_lumb)) & (fl_laminectomyetc == 1 | flg_discectomy == 1) & (hfhsMSSIC::is.not(flg_instrumentationplaced_cerv) & hfhsMSSIC::is.not(flg_instrumentationplaced_lumb)) ~ max(e_laminectomy_levels,discectomy_levels_e, na.rm = T),
+        flg_arthroplasty %in% c(0, NA) & (hfhsMSSIC::is.not(flg_arthrodesis_cerv) & hfhsMSSIC::is.not(flg_arthrodesis_lumb))&(flg_instrumentationplaced_cerv==1 | flg_instrumentationplaced_lumb==1)  ~ max(e_laminectomy_levels, e_arthrodesis_segments_lumb,e_arthrodesis_segments_cerv,discectomy_levels_e, na.rm = T)
        )#,
       # num_levels_lum = case_when(
       #   flg_arthroplasty == 1 & val_athrolevels > 1 ~ val_athrolevels,

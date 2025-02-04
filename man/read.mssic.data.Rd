@@ -2,12 +2,17 @@
 % Please edit documentation in R/read_mssic_data.R
 \name{read.mssic.data}
 \alias{read.mssic.data}
-\title{Function to read in MSSIC data just by giving a dat}
+\title{Function to read in MSSIC data just by giving a date}
 \usage{
-read.mssic.data(date)
+read.mssic.data(date, all = T, filt = T)
 }
 \arguments{
 \item{date}{date in \%m-\%d-\%Y format}
+
+\item{all}{logical value indicating whether you want an object with the full dataset, the abstraction form, ie form and proms form
+or just the full dataset. defaults to TRUE}
+
+\item{filt}{logical whether you want the abstraction form and inclusion/exclusion form filters. defaults to TRUE}
 }
 \description{
 e
