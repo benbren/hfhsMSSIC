@@ -9,16 +9,16 @@
 #' @export
 
 
-mssicRtoSAS <- function(date, fp, all = F) {
+mssicRtoSAS <- function(date, fp, all = F, levels = F) {
 
   dat = read.mssic.data(date)
   dat.r = recode.mssic(dat$full_dat)
-  haven::write_sas(dat.r, paste0(fp))
+  haven::write_xpt(dat.r, paste0(fp, ".xpt"))
 
   if(all){
-    haven::write_sas(dat$ab, paste0(fp,"_ab"))
-    haven::write_sas(dat$ie, paste0(fp,"_ie"))
-    haven::write_sas(dat$proms, paste0(fp,"_proms"))
+    haven::write_xpt(dat$ab, paste0(fp,"_ab.xpt"))
+    haven::write_xpt(dat$ie, paste0(fp,"_ie.xpt"))
+    haven::write_xpt(dat$proms, paste0(fp,"_proms.xpt"))
   }
 
 }
