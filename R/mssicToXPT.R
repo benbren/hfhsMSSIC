@@ -1,4 +1,4 @@
-#' Function to read in MSSIC data, recode and converto SAS7bdat
+#' Function to read in MSSIC data, recode and converto xpt for SAS
 #'
 #'
 #' e
@@ -9,7 +9,7 @@
 #' @export
 
 
-mssicRtoSAS <- function(date, fp, all = F, levels = F) {
+mssicToXPT <- function(date, fp, all = F, levels = F) {
 
   dat = read.mssic.data(date)
   dat.r = recode.mssic(dat$full_dat)
