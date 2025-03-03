@@ -21,8 +21,8 @@ recode.mssic = function(dat, levels = T, mcids = T){
     bmi_cat3 = ifelse(bmi >= 30, 1,0),
     bmi_cat = case_when(
       bmi < 18.5 ~ "underweight",
-      bmi >= 18.5 & bmi <= 24.9 ~ "normal",
-      25 <= bmi & bmi < 3 ~ "overweight",
+      bmi >= 18.5 & bmi <25 ~ "normal",
+      25 <= bmi & bmi < 30 ~ "overweight",
       bmi >= 30 ~ "obese",
       T ~ NA
     ),
